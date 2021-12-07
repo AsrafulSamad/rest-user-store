@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -26,6 +28,8 @@ public class UserServiceImpl implements UserService{
     private UserRepository userRepository;
     @Autowired
     private UserTagRepository userTagRepository;
+
+    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
     @Override
     public UserPostResponse createUser(UserPostRequest userPostRequest) {
@@ -97,9 +101,6 @@ public class UserServiceImpl implements UserService{
                         .expiry(userPostRequest.getExpiry())
                         .build();
 
-//                tags.setTag(tag);
-//                tags.setUserId(id);
-//                tags.setExpiry(userPostRequest.getExpiry());
                 userTagRepository.save(tags);
             } else {
                 userTag.setExpiry(userPostRequest.getExpiry());
@@ -108,45 +109,72 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    //TODO: This method need to have refactoring to optimize DB calling
+    //TODO: This method need to have refactoring to optimize DB calling and to reduce looping multiple times
     @Override
     public UserTagListResponse getUsersByTags(String[] tags) {
         UserTagListResponse userTagListResponse = new UserTagListResponse();
         List<UserTagDto> users = new ArrayList<UserTagDto>();
         Set<Long> checkSet =  new HashSet<Long>();
-
         for(String tag: tags){
-            UserTag userTag = userTagRepository.findByTag(tag);
-            if(userTag == null) {
+            List<UserTag> userTags = userTagRepository.findByTag(tag);
+
+            if(userTags == null || userTags.isEmpty()) {
                 continue;
             }
 
-            //TODO: Check Expiry
-            Optional<User> user = userRepository.findById(userTag.getUserId());
-            if(!user.isPresent()) {
-                continue;
-            }
+            for(UserTag userTag : userTags){
 
-            if(checkSet.contains(userTag.getUserId())){
-                for(UserTagDto userTagDto : users){
-                    if(userTagDto.getId() == userTag.getUserId()){
-                        userTagDto.tags.add(userTag.getTag());
-                        break;
-                    }
+                Optional<User> user = userRepository.findById(userTag.getUserId());
+                if(!user.isPresent()) {
+                    continue;
                 }
-            } else {
-                UserTagDto userTagDto = new UserTagDto();
-                userTagDto.id = userTag.getUserId();
-                userTagDto.name = user.get().getFirstName() + " " + user.get().getLastName();
-                userTagDto.tags = new HashSet<String>();
-                userTagDto.tags.add(userTag.getTag());
-                users.add(userTagDto);
 
+                if(cal.getTimeInMillis() > userTag.getExpiry()){
+                    log.error("User tag[{}] has been expired for userId:{}",userTag.getTag(),userTag.getUserId());
+                    continue;
+                }
+
+                if(checkSet.contains(userTag.getUserId())){
+                    for(UserTagDto userTagDto : users){
+                        if(userTagDto.getId() == userTag.getUserId()){
+                            userTagDto.getTags().add(userTag.getTag());
+                            break;
+                        }
+                    }
+                } else {
+                    Set<String> tagSet = new HashSet<String>();
+                    tagSet.add(userTag.getTag());
+
+                    UserTagDto userTagDto = UserTagDto.builder()
+                            .id(userTag.getUserId())
+                            .name(user.get().getFirstName() + " " + user.get().getLastName())
+                            .tags(tagSet)
+                            .build();
+
+                    users.add(userTagDto);
+                }
+
+                checkSet.add(userTag.getUserId());
             }
-
         }
-        userTagListResponse.users = users;
+
+        addOtherMissingTags(users);
+        userTagListResponse.setUsers(users);
 
         return userTagListResponse;
+    }
+
+
+    private List<UserTagDto>  addOtherMissingTags(List<UserTagDto> users){
+        //TODO: Need to remove DB query within for loop
+        for(UserTagDto userTagDto : users) {
+            List<UserTag> userTags = userTagRepository.findByUserId(userTagDto.getId());
+            for (UserTag userTag : userTags){
+                if(cal.getTimeInMillis() < userTag.getExpiry()) {
+                    userTagDto.getTags().add(userTag.getTag());
+                }
+            }
+        }
+        return users;
     }
 }

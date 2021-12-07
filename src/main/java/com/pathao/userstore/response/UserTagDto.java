@@ -1,14 +1,14 @@
 package com.pathao.userstore.response;
 
-import java.util.List;
+import lombok.Builder;
+import lombok.Data;
+
 import java.util.Set;
 
+@Data
+@Builder
 public class UserTagDto {
-    public Long id;
-    public String name;
-    public Set<String> tags;
-
-    public Long getId() {
-        return id;
-    }
+    Long id;
+    String name;
+    Set<String> tags;
 }

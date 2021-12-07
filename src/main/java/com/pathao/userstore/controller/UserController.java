@@ -57,7 +57,7 @@ public class UserController {
     UserTagListResponse getUsersByTags(@RequestParam String[] tags) {
         log.info("[REQ] -> Get users by tag list: {}", tags);
         UserTagListResponse users = userService.getUsersByTags(tags);
-        log.info("[RES] -> User list: {}", users);
+        log.info("[RES] -> User list: {}", users.getUsers());
         return users;
     }
 

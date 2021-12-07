@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  rest-user-store-springboot-container:
+    image: rest-user-store-spring-boot-docker-compose:1
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - /data/rest-user-store-springboot-container
+    ports:
+      - "8080:8080"

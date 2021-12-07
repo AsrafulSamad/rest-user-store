@@ -33,7 +33,24 @@ docker image list
 ### Run docket image
 ```
 docker run -p 8080:8080 -d --name rus-ins-1 rest-user-store:latest
+or
 docker run -p 8080:8080 -d --name rus-ins-1 asrafulksl/rest-user-store:rest-user-store
+```
+
+### Alternately Run at scale by 'docker-compose.yml'
+```
+version: '3'
+
+services:
+  rest-user-store-springboot-container:
+    image: rest-user-store-spring-boot-docker-compose:1
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - /data/rest-user-store-springboot-container
+    ports:
+      - "8080-8100:8080" 
 ```
 
 # Sample API Request Response

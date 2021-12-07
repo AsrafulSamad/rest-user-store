@@ -9,11 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@JsonSerialize
-@JsonDeserialize
-@Getter
 public class UserTagPostRequest {
-    public List<String> tags;
-    public Long expiry;
+    List<String> tags;
+    Long expiry;
 }

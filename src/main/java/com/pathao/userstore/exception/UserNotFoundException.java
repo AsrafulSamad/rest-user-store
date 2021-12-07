@@ -1,4 +1,4 @@
-package com.pathao.userstore.Exception;
+package com.pathao.userstore.exception;
 
 public class UserNotFoundException extends RuntimeException {
 

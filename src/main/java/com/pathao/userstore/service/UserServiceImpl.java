@@ -1,6 +1,6 @@
 package com.pathao.userstore.service;
 
-import com.pathao.userstore.Exception.UserNotFoundException;
+import com.pathao.userstore.exception.UserNotFoundException;
 import com.pathao.userstore.entity.User;
 import com.pathao.userstore.entity.UserTag;
 import com.pathao.userstore.repo.UserRepository;

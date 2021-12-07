@@ -9,14 +9,15 @@ Link: https://hackmd.io/@FS0ejO9xRXOnOkdbQAdemg/SJ3KU8X3W?type=view
 ./gradlew build
 ```
 
-### Build Docker Image
+### Building Docker Image
 ```
 docker build -t rest-user-store .
 ```
 
-### Build Docker Image for Docker hub
+### Building Docker Image for Docker hub
 ```
 docker build -t asrafulksl/rest-user-store:rest-user-store .
+docker push  asrafulksl/rest-user-store:rest-user-store
 ```
 
 ### Pull Docker Image from docker hub

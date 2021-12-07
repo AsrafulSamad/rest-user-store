@@ -2,6 +2,39 @@
 ## Problem Statement
 Link: https://hackmd.io/@FS0ejO9xRXOnOkdbQAdemg/SJ3KU8X3W?type=view
 
+
+# Building and Running
+### Gradle Build
+```
+./gradlew build
+```
+
+### Build Docker Image
+```
+docker build -t rest-user-store .
+```
+
+### Build Docker Image for Docker hub
+```
+docker build -t asrafulksl/rest-user-store:rest-user-store .
+```
+
+### Pull Docker Image from docker hub
+```
+docker pull asrafulksl/rest-user-store:rest-user-store
+```
+
+### Check Docker Image List
+```
+docker image list
+```
+
+### Run docket image
+```
+docker run -p 8080:8080 -d --name rus-ins-1 rest-user-store:latest
+docker run -p 8080:8080 -d --name rus-ins-1 asrafulksl/rest-user-store:rest-user-store
+```
+
 # Sample API Request Response
 
 ## User Creation
